@@ -4,6 +4,7 @@ const router = require('express').Router()
 const {
   checkUsernameFree,
   checkUsernameExists,
+  checkPasswordLength
 } = require('./auth-middleware')
 const bcrypt = require('bcryptjs')
 const Auth = require('../users/users-model')
@@ -21,15 +22,7 @@ router.post('/register', checkUsernameFree, async (req, res, next) => {
   }
 })
 
-/*
-  response on password three chars or less:
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
-  }
- */
-
-router.post('/login', checkUsernameExists, async (req, res, next) => {
+router.post('/login', checkUsernameExists, checkPasswordLength, async (req, res, next) => {
   const { username, password } = req.body
     try {
       const [user] = await findBy({ username })
