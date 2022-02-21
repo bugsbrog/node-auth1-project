@@ -1,4 +1,4 @@
-const {findBy} = require("../users/users-model");
+const User = require('../users/users-model')
 
 function restricted(req, res, next) {
     if (req.session.user) {
@@ -14,7 +14,7 @@ function restricted(req, res, next) {
 async function checkUsernameFree(req, res, next) {
     const { username } = req.body
         try {
-            const [user] = await findBy({ username })
+            const [user] = await User.findBy({ username })
                 if (user) {
                     next({
                         status: 422,
@@ -28,20 +28,21 @@ async function checkUsernameFree(req, res, next) {
         }
 }
 
-/*
-  If the username in req.body does NOT exist in the database
-
-  status 401
-  {
-    "message": "Invalid credentials"
-  }
-*/
-function checkUsernameExists(req, res, next) {
-    try {
-
-    } catch (err) {
-        next(err)
-    }
+async function checkUsernameExists(req, res, next) {
+    const { username } = req.body
+        try {
+            const [user] = await User.findBy({ username })
+                if (!user) {
+                    next({
+                        status: 401,
+                        message: 'Invalid credentials'
+                    })
+                } else {
+                    next()
+                }
+        } catch (err) {
+            next(err)
+        }
 }
 
 /*

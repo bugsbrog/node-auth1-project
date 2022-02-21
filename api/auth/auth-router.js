@@ -7,6 +7,7 @@ const {
 } = require('./auth-middleware')
 const bcrypt = require('bcryptjs')
 const Auth = require('../users/users-model')
+const {findBy} = require("../users/users-model");
 
 router.post('/register', checkUsernameFree, async (req, res, next) => {
   try {
@@ -20,22 +21,7 @@ router.post('/register', checkUsernameFree, async (req, res, next) => {
   }
 })
 
-/**
-  1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
-
-  response:
-  status 200
-  {
-    "user_id": 2,
-    "username": "sue"
-  }
-
-  response on username taken:
-  status 422
-  {
-    "message": "Username taken"
-  }
-
+/*
   response on password three chars or less:
   status 422
   {
@@ -43,8 +29,22 @@ router.post('/register', checkUsernameFree, async (req, res, next) => {
   }
  */
 
-router.post('/login', async (req, res, next) => {
-
+router.post('/login', checkUsernameExists, async (req, res, next) => {
+  const { username, password } = req.body
+    try {
+      const [user] = await findBy({ username })
+      if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.user = user
+        res.json({ message: `Welcome ${user.username}!`})
+      } else {
+        next({
+          status: 401,
+          message: 'Invalid credentials'
+        })
+      }
+    } catch (err) {
+      next(err)
+    }
 })
 /**
   2 [POST] /api/auth/login { "username": "sue", "password": "1234" }
