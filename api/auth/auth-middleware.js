@@ -1,11 +1,3 @@
-/*
-  If the user does not have a session saved in the server
-
-  status 401
-  {
-    "message": "You shall not pass!"
-  }
-*/
 function restricted(req, res, next) {
     if (req.session.user) {
         next()
