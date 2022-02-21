@@ -17,8 +17,12 @@ function restricted(req, res, next) {
     "message": "Username taken"
   }
 */
-function checkUsernameFree() {
+async function checkUsernameFree(req, res, next) {
+        try {
 
+        } catch (err) {
+            next(err)
+        }
 }
 
 /*
@@ -29,8 +33,12 @@ function checkUsernameFree() {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists() {
+function checkUsernameExists(req, res, next) {
+    try {
 
+    } catch (err) {
+        next(err)
+    }
 }
 
 /*
